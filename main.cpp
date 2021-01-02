@@ -2,7 +2,7 @@
 #include<fstream>
 #include<vector>
 #include<string>
-#include"include/LL1.h"
+#include"LL1/LL1.h"
 using std::cin;
 using std::cout;
 using std::endl;
@@ -44,12 +44,13 @@ int main(){
         }
 
         ll1.print();
+        system("pause");
 
-        //work
+       /*  //work
         do{
             ll1.parse(cin);
             cout << "quit?(y/n):";
             cin >> quit;
-        } while (quit != "y");
+        } while (quit != "y"); */
     }
 }

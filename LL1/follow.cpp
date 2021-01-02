@@ -1,4 +1,4 @@
-#include"include/LL1.h"
+#include"LL1.h"
 
 bool LL1::generateFollowSet(){
     return true;

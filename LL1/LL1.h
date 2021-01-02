@@ -13,7 +13,7 @@ private:
     //宏声明
     using prodc_input = std::string;//产生式输入
     using prodc_output = std::vector<std::string>;//产生式输出 eg. E -> A B C
-    using Production = std::unordered_map<prodc_input, std::unordered_set<prodc_output>>;
+    using Production = std::unordered_map<prodc_input, std::vector<prodc_output>>;
     using First_set = std::unordered_map<std::string, std::unordered_set<std::string>>;
     using Follow_set = std::unordered_map<std::string, std::unordered_set<std::string>>;
 
@@ -33,6 +33,7 @@ private:
     bool generateFirstSet();//得到first集
     bool generateFollowSet();//得到follow集合
     void printCur();//打印parse过程中栈，剩余输入符等信息
+    void string2production();
 
 public:
     LL1() = default;
@@ -43,9 +44,6 @@ public:
     void print();
 };
 
-LL1::LL1(std::istream &is){
-    init(is);
-}
 
 
 #endif
