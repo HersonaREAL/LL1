@@ -8,7 +8,7 @@ using std::stringstream;
 using std::vector;
 
 bool LL1::generate_table(){
-    removeDirect();
+    cookProduction();
     return true;
 }
 bool LL1::parse(std::istream &is){
@@ -50,14 +50,14 @@ void LL1::print(){
                 cout << "| ";
         }
     }
-    cout << "\ncookedProduction:" << endl;
+    cout << "\ntmpProduction:" << endl;
     //输出未处理产生式
-    for (auto beg = cooked_production.begin(); beg != cooked_production.end();++beg){
+    for (auto beg = tmp_production.begin(); beg != tmp_production.end();++beg){
         cout << (*beg).first << " -> ";
         for (auto outBeg = (*beg).second.begin(); outBeg != (*beg).second.end();++outBeg){
             for (auto strBeg = (*outBeg).begin(); strBeg != (*outBeg).end();++strBeg)
                 cout << *strBeg << " ";
-            if(outBeg==(*beg).second.end()-1)
+            if(outBeg==(--(*beg).second.end()))
                 cout << endl;
             else
                 cout << "| ";
