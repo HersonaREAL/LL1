@@ -34,6 +34,8 @@ private:
     bool generateFollowSet();//得到follow集合
     void printCur();//打印parse过程中栈，剩余输入符等信息
     void string2production();
+    void removeDirect();//消除直接左递归
+    void removeIndirect();//处理间接左递归
 
 public:
     LL1() = default;
