@@ -31,6 +31,7 @@ private:
     Follow_set follow_set;//随符集
     std::unordered_map<prodc_input, std::unordered_map<std::string, prodc_output>> analysis_table;//预测分析表
     bool isInit = false;
+    std::string start_symbol;//开始符号
 
     //函数声明
     bool cookProduction();//消除左递归
@@ -39,6 +40,8 @@ private:
     void printCur();//打印parse过程中栈，剩余输入符等信息
     void string2production();
     void removeDirect(Production_tmp &pt, int i);//消除直接左递归
+    void simplifiy();
+    void dfs();
 
 public:
     LL1() = default;

@@ -37,6 +37,7 @@ LL1::LL1(std::istream &is){
     init(is);
 }
 void LL1::print(){
+    cout << "startSymbol:" << start_symbol << endl;
     cout << "\nrawProduction:" << endl;
     //输出未处理产生式
     for (auto beg = raw_production.begin(); beg != raw_production.end();++beg){
@@ -44,7 +45,7 @@ void LL1::print(){
         for (auto outBeg = (*beg).second.begin(); outBeg != (*beg).second.end();++outBeg){
             for (auto strBeg = (*outBeg).begin(); strBeg != (*outBeg).end();++strBeg)
                 cout << *strBeg << " ";
-            if(outBeg==(*beg).second.end()-1)
+            if(outBeg==(--(*beg).second.end()))
                 cout << endl;
             else
                 cout << "| ";
@@ -77,6 +78,8 @@ void LL1::string2production(){
         string right_symbol;
         strS >> left_symbol;
         prodc_output out;
+        if(i==0)
+            start_symbol = left_symbol;
         while(strS>>right_symbol){
             if(right_symbol=="->")
                 continue;

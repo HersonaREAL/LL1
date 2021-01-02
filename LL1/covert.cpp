@@ -1,5 +1,6 @@
 #include"LL1.h"
 using std::list;
+using std::map;
 using std::string;
 using std::vector;
 bool LL1::cookProduction(){
@@ -33,8 +34,8 @@ bool LL1::cookProduction(){
         }
         removeDirect(tmp_production, i);
     }
-
-        return true;
+    simplifiy();
+    return true;
 }
 void LL1::removeDirect(Production_tmp &pt, int i){
     //P->Pa1|Pa2|...|Pam|b1|b2|...|bn
@@ -62,4 +63,17 @@ void LL1::removeDirect(Production_tmp &pt, int i){
         pt[i].second = beta;
         pt.push_back(std::make_pair(new_left, alpha));
     }
+}
+
+void LL1::simplifiy(){
+    cooked_production.insert(tmp_production.begin(), tmp_production.end());
+    map<prodc_input, bool> used;
+    
+    for (auto ptr = cooked_production.begin(); ptr != cooked_production.end();++ptr)
+        used[(*ptr).first] = false;
+
+    auto dfs = [&used](string S)->void {
+        
+    };
+    dfs(start_symbol);
 }
