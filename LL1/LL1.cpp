@@ -74,7 +74,7 @@ void LL1::print(){
         for (auto outBeg = (*beg).second.begin(); outBeg != (*beg).second.end();++outBeg){
             for (auto strBeg = (*outBeg).begin(); strBeg != (*outBeg).end();++strBeg)
                 cout << *strBeg << " ";
-            if(outBeg==(--(*beg).second.end()))
+            if(outBeg==(--((*beg).second.end())))
                 cout << endl;
             else
                 cout << "| ";
@@ -90,6 +90,17 @@ void LL1::print(){
     for (auto ptr = terminal.cbegin(); ptr != terminal.cend();++ptr)
         cout << *ptr << ", ";
     cout << "}" << endl;
+
+    //输出first集
+    cout << "\nfirst:" << endl;
+    for (auto ptr = first_set.cbegin(); ptr != first_set.cend();++ptr){
+        if(non_terminal.find((*ptr).first)!=non_terminal.end()){
+            cout << "first(" << (*ptr).first << ") = {";
+            for (auto s_ptr = (*ptr).second.cbegin(); s_ptr != (*ptr).second.cend();++s_ptr)
+                cout << *s_ptr << ", ";
+            cout << "}" << endl;
+        }
+    }
 }
 void LL1::printCur(){
     

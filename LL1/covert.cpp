@@ -72,12 +72,12 @@ void LL1::simplifiy(){
         used[(*ptr).first] = false;
     //从开始符号深度遍历,简化产生式
     dfs(start_symbol,used);
-
+    
     //去除没有被遍历到的产生式
     for (auto ptr = used.cbegin(); ptr != used.cend();++ptr)
         if(!(*ptr).second)
             cooked_production.erase((*ptr).first);
-            
+       
     //记录终结符与非终结符
     for(auto ptr = cooked_production.begin(); ptr != cooked_production.end();++ptr){
         non_terminal.insert((*ptr).first);
