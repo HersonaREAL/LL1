@@ -42,6 +42,7 @@ private:
     void removeDirect(Production_tmp &pt, int i);//消除直接左递归
     void simplifiy();
     void dfs(const std::string &S,std::unordered_map<prodc_input, bool> &used);
+    std::unordered_set<std::string> getFirst(std::string S);
 
 public:
     LL1() = default;

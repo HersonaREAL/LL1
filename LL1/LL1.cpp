@@ -9,6 +9,8 @@ using std::vector;
 
 bool LL1::generate_table(){
     cookProduction();
+    generateFirstSet();
+    generateFollowSet();
     return true;
 }
 bool LL1::parse(std::istream &is){
