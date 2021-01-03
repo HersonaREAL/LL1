@@ -52,7 +52,7 @@ void LL1::print(){
         }
     }
     cout << "\ntmpProduction:" << endl;
-    //输出未处理产生式
+    //输出中间产生式
     for (auto beg = tmp_production.begin(); beg != tmp_production.end();++beg){
         cout << (*beg).first << " -> ";
         for (auto outBeg = (*beg).second.begin(); outBeg != (*beg).second.end();++outBeg){
@@ -65,6 +65,29 @@ void LL1::print(){
         }
     }
 
+    //输出处理好的产生式
+    cout << "\ncookedProduction:" << endl;
+    for (auto beg = cooked_production.begin(); beg != cooked_production.end();++beg){
+        cout << (*beg).first << " -> ";
+        for (auto outBeg = (*beg).second.begin(); outBeg != (*beg).second.end();++outBeg){
+            for (auto strBeg = (*outBeg).begin(); strBeg != (*outBeg).end();++strBeg)
+                cout << *strBeg << " ";
+            if(outBeg==(--(*beg).second.end()))
+                cout << endl;
+            else
+                cout << "| ";
+        }
+    }
+
+    //输出终结符与非终结符
+    cout << "\nnonTerminal = {";
+    for (auto ptr = non_terminal.cbegin(); ptr != non_terminal.cend();++ptr)
+        cout << *ptr << ", ";
+    cout << "}" << endl;
+    cout << "Terminal = {";
+    for (auto ptr = terminal.cbegin(); ptr != terminal.cend();++ptr)
+        cout << *ptr << ", ";
+    cout << "}" << endl;
 }
 void LL1::printCur(){
     

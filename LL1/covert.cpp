@@ -2,6 +2,7 @@
 using std::list;
 using std::map;
 using std::string;
+using std::unordered_map;
 using std::vector;
 bool LL1::cookProduction(){
     tmp_production.assign(raw_production.begin(), raw_production.end());
@@ -14,7 +15,6 @@ bool LL1::cookProduction(){
             //遍历Ai右边
             for (auto it = Ai_right.begin(); it != Ai_right.end();++it){
                 if((*it)[0]==Aj){
-                    std::cout << (*it)[0] << std::endl;
                     //Ai->Ajγ
                     //产生新候选式
                     vector<prodc_output> new_right;
@@ -67,13 +67,40 @@ void LL1::removeDirect(Production_tmp &pt, int i){
 
 void LL1::simplifiy(){
     cooked_production.insert(tmp_production.begin(), tmp_production.end());
-    map<prodc_input, bool> used;
-    
+    unordered_map<prodc_input, bool> used;
     for (auto ptr = cooked_production.begin(); ptr != cooked_production.end();++ptr)
         used[(*ptr).first] = false;
+    //从开始符号深度遍历,简化产生式
+    dfs(start_symbol,used);
 
-    auto dfs = [&used](string S)->void {
-        
-    };
-    dfs(start_symbol);
+    //去除没有被遍历到的产生式
+    for (auto ptr = used.cbegin(); ptr != used.cend();++ptr)
+        if(!(*ptr).second)
+            cooked_production.erase((*ptr).first);
+            
+    //记录终结符与非终结符
+    for(auto ptr = cooked_production.begin(); ptr != cooked_production.end();++ptr){
+        non_terminal.insert((*ptr).first);
+
+        const list<prodc_output> &all_right = (*ptr).second;
+        for (auto lst_it = all_right.cbegin(); lst_it != all_right.cend();++lst_it){
+            for (auto str_it = (*lst_it).cbegin(); str_it != (*lst_it).cend();++str_it){
+                if(cooked_production.find((*str_it))==cooked_production.end())
+                    terminal.insert(*str_it);
+            }
+        }
+    }
+}
+void LL1::dfs(const string &S,unordered_map<prodc_input, bool> &used){
+    if(used[S])
+        return;
+    used[S] = true;
+    const list<prodc_output> &all_right = cooked_production[S];
+    for (auto lst_it = all_right.cbegin(); lst_it != all_right.cend();++lst_it){
+        for (auto str_it = (*lst_it).cbegin(); str_it != (*lst_it).cend();++str_it){
+            //深度遍历非终结符
+            if(used.find((*str_it))!=used.end())
+                dfs((*str_it),used); 
+        }
+    }
 }

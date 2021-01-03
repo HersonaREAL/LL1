@@ -15,7 +15,7 @@ private:
     //宏声明
     using prodc_input = std::string;//产生式输入
     using prodc_output = std::vector<std::string>;//产生式输出 eg. E -> A B C
-    using Production = std::map<prodc_input, std::list<prodc_output>>;
+    using Production = std::unordered_map<prodc_input, std::list<prodc_output>>;
     using Production_tmp = std::vector<std::pair<prodc_input, std::list<prodc_output>>>;
     using First_set = std::unordered_map<std::string, std::unordered_set<std::string>>;
     using Follow_set = std::unordered_map<std::string, std::unordered_set<std::string>>;
@@ -41,7 +41,7 @@ private:
     void string2production();
     void removeDirect(Production_tmp &pt, int i);//消除直接左递归
     void simplifiy();
-    void dfs();
+    void dfs(const std::string &S,std::unordered_map<prodc_input, bool> &used);
 
 public:
     LL1() = default;
