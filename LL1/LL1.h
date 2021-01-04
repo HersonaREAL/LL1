@@ -1,5 +1,6 @@
 #include<iostream>
 #include<unordered_map>
+#include<algorithm>
 #include<map>
 #include<unordered_set>
 #include<vector>
@@ -41,6 +42,7 @@ private:
     void string2production();
     void removeDirect(Production_tmp &pt, int i);//消除直接左递归
     void simplifiy();
+    void removeLeftCommonFactor();//消除左公因子
     void dfs(const std::string &S,std::unordered_map<prodc_input, bool> &used);
     std::unordered_set<std::string> getFirst(std::string S);
 

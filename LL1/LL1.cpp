@@ -131,4 +131,5 @@ void LL1::string2production(){
         //存入产生式数据中
         raw_production[left_symbol].push_back(out);
     }
+    
 }

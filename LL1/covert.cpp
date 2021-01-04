@@ -1,12 +1,21 @@
 #include"LL1.h"
+using std::find;
+using std::find_if;
 using std::list;
 using std::map;
+using std::pair;
 using std::string;
 using std::unordered_map;
 using std::vector;
 bool LL1::cookProduction(){
-    tmp_production.assign(raw_production.begin(), raw_production.end());
+    //非终结符排序时，把开始符号放后面，防止简化出屎
+    for (auto ptr = raw_production.cbegin(); ptr != raw_production.cend();++ptr)
+        if((*ptr).first!=start_symbol)
+            tmp_production.push_back({(*ptr).first, (*ptr).second});
+    tmp_production.push_back({start_symbol, raw_production[start_symbol]});
+
     int n = tmp_production.size();
+    //消除间接递归
     for (int i = 0; i < n;++i){
         for (int j = 0; j < i;++j){
             const string &Aj = tmp_production[j].first;
@@ -34,7 +43,25 @@ bool LL1::cookProduction(){
         }
         removeDirect(tmp_production, i);
     }
+
     simplifiy();
+    
+    removeLeftCommonFactor();
+    cooked_production.clear();
+    cooked_production.insert(tmp_production.begin(), tmp_production.end());
+
+    //记录终结符与非终结符
+    for(auto ptr = cooked_production.begin(); ptr != cooked_production.end();++ptr){
+        non_terminal.insert((*ptr).first);
+
+        const list<prodc_output> &all_right = (*ptr).second;
+        for (auto lst_it = all_right.cbegin(); lst_it != all_right.cend();++lst_it){
+            for (auto str_it = (*lst_it).cbegin(); str_it != (*lst_it).cend();++str_it){
+                if(cooked_production.find((*str_it))==cooked_production.end())
+                    terminal.insert(*str_it);
+            }
+        }
+    }
     return true;
 }
 void LL1::removeDirect(Production_tmp &pt, int i){
@@ -77,19 +104,6 @@ void LL1::simplifiy(){
     for (auto ptr = used.cbegin(); ptr != used.cend();++ptr)
         if(!(*ptr).second)
             cooked_production.erase((*ptr).first);
-       
-    //记录终结符与非终结符
-    for(auto ptr = cooked_production.begin(); ptr != cooked_production.end();++ptr){
-        non_terminal.insert((*ptr).first);
-
-        const list<prodc_output> &all_right = (*ptr).second;
-        for (auto lst_it = all_right.cbegin(); lst_it != all_right.cend();++lst_it){
-            for (auto str_it = (*lst_it).cbegin(); str_it != (*lst_it).cend();++str_it){
-                if(cooked_production.find((*str_it))==cooked_production.end())
-                    terminal.insert(*str_it);
-            }
-        }
-    }
 }
 void LL1::dfs(const string &S,unordered_map<prodc_input, bool> &used){
     if(used[S])
@@ -101,6 +115,40 @@ void LL1::dfs(const string &S,unordered_map<prodc_input, bool> &used){
             //深度遍历非终结符
             if(used.find((*str_it))!=used.end())
                 dfs((*str_it),used); 
+        }
+    }
+}
+void LL1::removeLeftCommonFactor(){
+    //A->aβ1|aβ2|...|aβi|βi+1|...|βj|a
+    //A->aA'|βi+1|...|βj 
+    //A->β1|...|βj|@
+    tmp_production.assign(cooked_production.begin(), cooked_production.end());
+    for (int i = 0; i < tmp_production.size();++i){
+        const string &left = tmp_production[i].first;
+        const string &newleft = left + "\"";
+        list<prodc_output> &all_right = tmp_production[i].second;
+        map<string, unsigned> count;//计算右边第一个符号出现的次数
+        for (auto v_it = all_right.cbegin(); v_it != all_right.cend();++v_it)
+            ++count[(*v_it)[0]];
+        //找有无公共左因子
+        auto com_it = find_if(count.begin(), count.end(), [](const pair<string, unsigned> &a) { return a.second > 1; });
+        if(com_it!=count.end()){
+            string left_com = (*com_it).first;
+            list<prodc_output> new_right;
+            for (auto v_it = all_right.begin(); v_it != all_right.end();++v_it){
+                //遍历右边,找到公共左因子式子进行操作
+                if((*v_it)[0]==left_com){
+                    if((*v_it).size()==1)
+                        new_right.push_back({"@"});//只有一个左因子的换成空串
+                    else
+                        new_right.push_back(prodc_output((*v_it).begin() + 1, ((*v_it).end())));
+                    v_it = all_right.erase(v_it);//擦除原式
+                    --v_it;
+                }
+            }
+            //生成新的候选式
+            tmp_production[i].second.push_back({left_com, newleft});
+            tmp_production.push_back({newleft, new_right});
         }
     }
 }
