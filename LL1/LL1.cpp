@@ -1,8 +1,10 @@
 #include "LL1.h"
 #include<iostream>
 #include<sstream>
+#include<iomanip>
 using std::cout;
 using std::endl;
+using std::list;
 using std::string;
 using std::stringstream;
 using std::vector;
@@ -11,6 +13,34 @@ bool LL1::generate_table(){
     cookProduction();
     generateFirstSet();
     generateFollowSet();
+
+    //生成预测分析表
+    for (auto ptr = cooked_production.cbegin(); ptr != cooked_production.cend();++ptr){
+        const string &A = (*ptr).first;
+        const list<prodc_output> &all_right = (*ptr).second;
+        for (auto r_ptr = all_right.cbegin(); r_ptr != all_right.cend();++r_ptr){
+            //A->alpha，*r_ptr = alpha
+            const auto &alpha = *r_ptr;
+            for (auto t_it = terminal.cbegin(); t_it != terminal.cend();++t_it){
+                const string &a = (*t_it);
+
+                //跳过终结符
+                if(a=="@") continue;
+
+                //终结符a∈first(A)
+                if(first_set[A].find(a)!=first_set[A].end()){
+                    //a∈first(alpha)
+                    if(right_first_set[A][alpha].find(a)!=right_first_set[A][alpha].end())
+                        analysis_table[A][a] = alpha;
+                }
+            }
+            
+        }
+        if(first_set[A].find("@")!=first_set[A].end()){
+            for (auto it = follow_set[A].cbegin(); it != follow_set[A].cend();++it)
+                analysis_table[A][*it] = {"@"};
+        }
+    }
     return true;
 }
 bool LL1::parse(std::istream &is){
@@ -102,7 +132,24 @@ void LL1::print(){
         }
     }
 
-    //输出follow集
+    //输出候选式first
+    cout << "\nright first:" << endl;
+    for (auto ptr = right_first_set.begin(); ptr != right_first_set.end();++ptr){
+        cout << (*ptr).first << "->" << endl;
+        auto first_map = (*ptr).second;
+        for (auto k_it = first_map.begin(); k_it != first_map.end();++k_it){
+            cout << "first(";
+            for (auto s_it = (*k_it).first.begin(); s_it != (*k_it).first.end();++s_it)
+                cout << *s_it << " ";
+            cout << ")={";
+            for(auto s_it = (*k_it).second.begin(); s_it != (*k_it).second.end();++s_it)
+                cout << *s_it << ", ";
+            cout << "}\n";
+        }
+        cout << endl;
+    }
+
+        //输出follow集
     cout << "\nfollow:" << endl;
     for (auto ptr = follow_set.cbegin(); ptr != follow_set.cend();++ptr){
         if(non_terminal.find((*ptr).first)!=non_terminal.end()){
@@ -112,6 +159,29 @@ void LL1::print(){
             cout << "}" << endl;
         }
     }
+
+    //输出预测分析表
+    cout << "\ntable:" << endl;
+    /* for (auto it = terminal.cbegin(); it != terminal.cend();++it)
+        if((*it)!="@")
+            cout <<std::setw(15)<< (*it) ; */
+    for (auto t_it = analysis_table.cbegin(); t_it != analysis_table.cend(); ++t_it){
+        cout << endl<<std::left<<std::setw(10)<< (*t_it).first;
+        for (auto it = terminal.cbegin(); it != terminal.cend();++it){
+            if((*it)!="@"){
+                cout<< (*it)<<" -> " ;
+                const prodc_output &one_right = analysis_table[(*t_it).first][*it];
+                if(one_right.empty())
+                    cout <<std::left<< std::setw(15)<<"null";
+                for (auto s_it = one_right.cbegin(); s_it != one_right.cend();++s_it)
+                    if(s_it!=one_right.cend()-1)
+                        cout << *s_it << " ";
+                    else
+                        cout << std::left << std::setw(15) << *s_it;
+            }
+        }
+    }
+    cout << endl;
 }
 void LL1::printCur(){
     

@@ -3,17 +3,14 @@ using std::list;
 using std::string;
 using std::unordered_set;
 bool LL1::generateFollowSet(){
-    print();
     for (auto ptr = non_terminal.cbegin(); ptr != non_terminal.cend();++ptr)
         getFollow(*ptr);
     return true;
 }
 unordered_set<std::string> LL1::getFollow(std::string S){
-    std::cout <<"\nnow in "<< S << std::endl;
-    if(!follow_set[S].empty()){
-        std::cout << "direct exit in " << S << std::endl;
+    if(!follow_set[S].empty())
         return follow_set[S];
-    }
+    
     unordered_set<std::string> tmp_set;
     if(S==start_symbol)
         tmp_set.insert("#");
@@ -23,7 +20,6 @@ unordered_set<std::string> LL1::getFollow(std::string S){
         for (auto r_ptr = all_right.cbegin(); r_ptr != all_right.cend();++r_ptr){
             const prodc_output &oneR = (*r_ptr);
             for (auto i = 0; i < oneR.size();++i){
-                std::cout << oneR[i] << " ";
                 if(oneR[i]==S){
                     //B->aS
                     if(i==(oneR.size()-1)){
@@ -43,10 +39,8 @@ unordered_set<std::string> LL1::getFollow(std::string S){
                     }
                 }
             }
-            std::cout << std::endl;
         }
     }
     follow_set[S] = tmp_set;
-    std::cout << "exit in " << S << std::endl;
     return follow_set[S];
 }

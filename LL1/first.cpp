@@ -24,16 +24,19 @@ unordered_set<std::string> LL1::getFirst(string S){
     for (auto r_ptr = all_right.cbegin(); r_ptr != all_right.cend();++r_ptr){
         auto s_ptr = (*r_ptr).cbegin();
         unordered_set<std::string> first_Xi;
+        unordered_set<std::string> right_tmp_set;//候选式首符集合
         for (; s_ptr != (*r_ptr).cend();++s_ptr){
             first_Xi = getFirst(*s_ptr);
-            tmp_set.insert(first_Xi.begin(), first_Xi.end());
-            if(first_Xi.find("@")!=first_Xi.end())
-                tmp_set.erase("@");
+            right_tmp_set.insert(first_Xi.begin(), first_Xi.end());
+            if (first_Xi.find("@")!=first_Xi.end())
+                right_tmp_set.erase("@");
             else
                 break;
         }
-        if(s_ptr==(*r_ptr).cend()&&first_Xi.find("@")!=first_Xi.end())
-            tmp_set.insert("@");
+        if (s_ptr==(*r_ptr).cend()&&first_Xi.find("@")!=first_Xi.end())
+            right_tmp_set.insert("@");
+        tmp_set.insert(right_tmp_set.begin(), right_tmp_set.end());
+        right_first_set[S][(*r_ptr)] = right_tmp_set;
     }
     first_set[S] = tmp_set;
     return first_set[S];

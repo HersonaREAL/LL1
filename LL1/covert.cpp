@@ -62,6 +62,7 @@ bool LL1::cookProduction(){
             }
         }
     }
+    terminal.insert("#");
     return true;
 }
 void LL1::removeDirect(Production_tmp &pt, int i){
