@@ -41,10 +41,50 @@ bool LL1::generate_table(){
                 analysis_table[A][*it] = {"@"};
         }
     }
+    terminal.erase("@");
     return true;
 }
 bool LL1::parse(std::istream &is){
-    return true;
+    list<string> content;
+    string word;
+    while(is>>word)
+        content.push_back(word);
+    content.push_back("#");
+    list<string> stk;
+    stk.push_back("#");
+    stk.push_back(start_symbol);
+    for (auto it = content.cbegin(); it !=content.cend();){
+        printCur(stk,content,it);
+        const string stk_top = stk.back();
+        //语法正确
+        if(stk_top=="#"){
+            stk.pop_back();
+            printCur(stk,content,it);
+            return true;
+        }
+        //终结符
+        if(terminal.find(stk_top)!=terminal.end()){
+            if(stk_top!=*it)
+                return false;
+            stk.pop_back();
+            ++it;
+        }else{
+            //非终结符
+            if(analysis_table[stk_top][*it].empty())
+                return false;
+            //遇到空串
+            if(analysis_table[stk_top][*it][0]=="@"){
+                stk.pop_back();
+                continue;
+            }
+            stk.pop_back();
+            for (auto s_it = analysis_table[stk_top][*it].crbegin(); s_it != analysis_table[stk_top][*it].crend();++s_it)
+                stk.push_back(*s_it);
+        }
+
+    }
+
+    return false;
 }
 
 void LL1::init(std::istream &is){
@@ -84,7 +124,7 @@ void LL1::print(){
         }
     }
     cout << "\ntmpProduction:" << endl;
-    //输出中间产生式
+    /* //输出中间产生式
     for (auto beg = tmp_production.begin(); beg != tmp_production.end();++beg){
         cout << (*beg).first << " -> ";
         for (auto outBeg = (*beg).second.begin(); outBeg != (*beg).second.end();++outBeg){
@@ -95,7 +135,7 @@ void LL1::print(){
             else
                 cout << "| ";
         }
-    }
+    } */
 
     //输出处理好的产生式
     cout << "\ncookedProduction:" << endl;
@@ -132,7 +172,7 @@ void LL1::print(){
         }
     }
 
-    //输出候选式first
+    /* //输出候选式first
     cout << "\nright first:" << endl;
     for (auto ptr = right_first_set.begin(); ptr != right_first_set.end();++ptr){
         cout << (*ptr).first << "->" << endl;
@@ -147,7 +187,7 @@ void LL1::print(){
             cout << "}\n";
         }
         cout << endl;
-    }
+    } */
 
         //输出follow集
     cout << "\nfollow:" << endl;
@@ -183,8 +223,15 @@ void LL1::print(){
     }
     cout << endl;
 }
-void LL1::printCur(){
-    
+void LL1::printCur(const list<std::string> &stk,const list<string> &content,list<string>::const_iterator it){
+    cout << "stack: ";
+    for (auto s_it = stk.cbegin(); s_it != stk.cend();++s_it)
+        cout << *s_it << ", ";
+    cout << "\nremain: ";
+    while(it!=content.cend())
+        cout << *it++ << " ";
+    cout << endl
+         << endl;
 }
 
 void LL1::string2production(){

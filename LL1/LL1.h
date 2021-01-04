@@ -39,7 +39,7 @@ private:
     bool cookProduction();//消除左递归
     bool generateFirstSet();//得到first集
     bool generateFollowSet();//得到follow集合
-    void printCur();//打印parse过程中栈，剩余输入符等信息
+    void printCur(const std::list<std::string> &stk,const std::list<std::string> &content,std::list<std::string>::const_iterator it);//打印parse过程中栈，剩余输入符等信息
     void string2production();
     void removeDirect(Production_tmp &pt, int i);//消除直接左递归
     void simplifiy();
