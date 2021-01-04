@@ -16,7 +16,7 @@ private:
     //宏声明
     using prodc_input = std::string;//产生式输入
     using prodc_output = std::vector<std::string>;//产生式输出 eg. E -> A B C
-    using Production = std::unordered_map<prodc_input, std::list<prodc_output>>;
+    using Production = std::map<prodc_input, std::list<prodc_output>>;
     using Production_tmp = std::vector<std::pair<prodc_input, std::list<prodc_output>>>;
     using First_set = std::unordered_map<std::string, std::unordered_set<std::string>>;
     using Follow_set = std::unordered_map<std::string, std::unordered_set<std::string>>;
@@ -45,7 +45,7 @@ private:
     void removeLeftCommonFactor();//消除左公因子
     void dfs(const std::string &S,std::unordered_map<prodc_input, bool> &used);
     std::unordered_set<std::string> getFirst(std::string S);
-
+    std::unordered_set<std::string> getFollow(std::string S);
 public:
     LL1() = default;
     LL1(std::istream &is);

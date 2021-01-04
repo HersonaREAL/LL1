@@ -101,6 +101,17 @@ void LL1::print(){
             cout << "}" << endl;
         }
     }
+
+    //输出follow集
+    cout << "\nfollow:" << endl;
+    for (auto ptr = follow_set.cbegin(); ptr != follow_set.cend();++ptr){
+        if(non_terminal.find((*ptr).first)!=non_terminal.end()){
+            cout << "follow(" << (*ptr).first << ") = {";
+            for (auto s_ptr = (*ptr).second.cbegin(); s_ptr != (*ptr).second.cend();++s_ptr)
+                cout << *s_ptr << ", ";
+            cout << "}" << endl;
+        }
+    }
 }
 void LL1::printCur(){
     
