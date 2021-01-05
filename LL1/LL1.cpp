@@ -10,6 +10,8 @@ using std::stringstream;
 using std::vector;
 
 bool LL1::generate_table(){
+    if(!isInit)
+        return false;
     cookProduction();
     generateFirstSet();
     generateFollowSet();
@@ -24,7 +26,7 @@ bool LL1::generate_table(){
             for (auto t_it = terminal.cbegin(); t_it != terminal.cend();++t_it){
                 const string &a = (*t_it);
 
-                //跳过终结符
+                //跳过空串
                 if(a=="@") continue;
 
                 //终结符a∈first(A)
@@ -41,7 +43,6 @@ bool LL1::generate_table(){
                 analysis_table[A][*it] = {"@"};
         }
     }
-    terminal.erase("@");
     return true;
 }
 bool LL1::parse(std::istream &is){
@@ -59,13 +60,16 @@ bool LL1::parse(std::istream &is){
         //语法正确
         if(stk_top=="#"){
             stk.pop_back();
-            printCur(stk,content,it);
+            cout << "action: accept" << endl
+                 << endl;
             return true;
         }
         //终结符
         if(terminal.find(stk_top)!=terminal.end()){
             if(stk_top!=*it)
                 return false;
+            cout << "action: match " << *it << endl
+                 << endl;
             stk.pop_back();
             ++it;
         }else{
@@ -74,12 +78,19 @@ bool LL1::parse(std::istream &is){
                 return false;
             //遇到空串
             if(analysis_table[stk_top][*it][0]=="@"){
+                cout << "action: " << stk_top << "-> @" << endl
+                     << endl;
                 stk.pop_back();
                 continue;
             }
             stk.pop_back();
             for (auto s_it = analysis_table[stk_top][*it].crbegin(); s_it != analysis_table[stk_top][*it].crend();++s_it)
                 stk.push_back(*s_it);
+            cout << "action: " << stk_top << " -> ";
+            for (auto s_it = analysis_table[stk_top][*it].cbegin(); s_it != analysis_table[stk_top][*it].cend();++s_it)
+                cout << *s_it << " ";
+            cout << endl
+                 << endl;
         }
 
     }
@@ -88,15 +99,20 @@ bool LL1::parse(std::istream &is){
 }
 
 void LL1::init(std::istream &is){
+    //清空缓存
     origin_input.clear();
     raw_production.clear();
+    tmp_production.clear();
     cooked_production.clear();
     terminal.clear();
     non_terminal.clear();
     first_set.clear();
     follow_set.clear();
     analysis_table.clear();
+    start_symbol.clear();
+    right_first_set.clear();
     string prodc;
+
     //读取产生式
     while(getline(is,prodc))
         if(!prodc.empty())
@@ -111,6 +127,7 @@ LL1::LL1(std::istream &is){
 void LL1::print(){
     cout << "startSymbol:" << start_symbol << endl;
     cout << "\nrawProduction:" << endl;
+
     //输出未处理产生式
     for (auto beg = raw_production.begin(); beg != raw_production.end();++beg){
         cout << (*beg).first << " -> ";
@@ -123,19 +140,6 @@ void LL1::print(){
                 cout << "| ";
         }
     }
-    cout << "\ntmpProduction:" << endl;
-    /* //输出中间产生式
-    for (auto beg = tmp_production.begin(); beg != tmp_production.end();++beg){
-        cout << (*beg).first << " -> ";
-        for (auto outBeg = (*beg).second.begin(); outBeg != (*beg).second.end();++outBeg){
-            for (auto strBeg = (*outBeg).begin(); strBeg != (*outBeg).end();++strBeg)
-                cout << *strBeg << " ";
-            if(outBeg==(--(*beg).second.end()))
-                cout << endl;
-            else
-                cout << "| ";
-        }
-    } */
 
     //输出处理好的产生式
     cout << "\ncookedProduction:" << endl;
@@ -172,7 +176,7 @@ void LL1::print(){
         }
     }
 
-    /* //输出候选式first
+    //输出候选式first
     cout << "\nright first:" << endl;
     for (auto ptr = right_first_set.begin(); ptr != right_first_set.end();++ptr){
         cout << (*ptr).first << "->" << endl;
@@ -187,9 +191,9 @@ void LL1::print(){
             cout << "}\n";
         }
         cout << endl;
-    } */
+    }
 
-        //输出follow集
+    //输出follow集
     cout << "\nfollow:" << endl;
     for (auto ptr = follow_set.cbegin(); ptr != follow_set.cend();++ptr){
         if(non_terminal.find((*ptr).first)!=non_terminal.end()){
@@ -202,26 +206,26 @@ void LL1::print(){
 
     //输出预测分析表
     cout << "\ntable:" << endl;
-    /* for (auto it = terminal.cbegin(); it != terminal.cend();++it)
+    cout<<std::left <<std::setw(15)<< " " ;
+    for (auto it = terminal.cbegin(); it != terminal.cend();++it)
         if((*it)!="@")
-            cout <<std::setw(15)<< (*it) ; */
+            cout<<std::left <<std::setw(15)<< (*it) ;
     for (auto t_it = analysis_table.cbegin(); t_it != analysis_table.cend(); ++t_it){
-        cout << endl<<std::left<<std::setw(10)<< (*t_it).first;
+        cout << endl<<std::left<<std::setw(15)<< (*t_it).first;
         for (auto it = terminal.cbegin(); it != terminal.cend();++it){
             if((*it)!="@"){
-                cout<< (*it)<<" -> " ;
+                //cout<< (*it)<<" -> " ;
                 const prodc_output &one_right = analysis_table[(*t_it).first][*it];
+                string s_out;
                 if(one_right.empty())
-                    cout <<std::left<< std::setw(15)<<"null";
+                    s_out += "null";
                 for (auto s_it = one_right.cbegin(); s_it != one_right.cend();++s_it)
-                    if(s_it!=one_right.cend()-1)
-                        cout << *s_it << " ";
-                    else
-                        cout << std::left << std::setw(15) << *s_it;
+                    s_out += (*s_it + " ");
+                cout <<std::left<< std::setw(15)<<s_out;
             }
         }
     }
-    cout << endl;
+    cout << endl<<endl;
 }
 void LL1::printCur(const list<std::string> &stk,const list<string> &content,list<string>::const_iterator it){
     cout << "stack: ";
@@ -230,8 +234,8 @@ void LL1::printCur(const list<std::string> &stk,const list<string> &content,list
     cout << "\nremain: ";
     while(it!=content.cend())
         cout << *it++ << " ";
-    cout << endl
-         << endl;
+    cout << endl;
+
 }
 
 void LL1::string2production(){

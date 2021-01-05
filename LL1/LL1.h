@@ -36,7 +36,7 @@ private:
     std::string start_symbol;//开始符号
 
     //函数声明
-    bool cookProduction();//消除左递归
+    bool cookProduction();//消除左递归并提取左公因子
     bool generateFirstSet();//得到first集
     bool generateFollowSet();//得到follow集合
     void printCur(const std::list<std::string> &stk,const std::list<std::string> &content,std::list<std::string>::const_iterator it);//打印parse过程中栈，剩余输入符等信息
