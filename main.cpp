@@ -31,7 +31,10 @@ int main(){
         LL1 ll1(if1);
         ll1.generate_table();
         ll1.print();
-        ll1.parse(if2);
+        if(ll1.parse(if2))
+            cout << "result:okkkkkkkkkkkkkkkkkkkkkkkkkkkkk" << endl;
+        else
+            cout << "result:nooooooooooooooooooooooooooooo" << endl;
 
     }else{
         string quit;
@@ -44,13 +47,18 @@ int main(){
         }
 
         ll1.print();
-        system("pause");
 
-       /*  //work
+        //work
         do{
-            ll1.parse(cin);
+            cin.clear();
+            cout << "input text(ctrl+z end):" << endl;
+            if(ll1.parse(cin))
+                cout << "result:okkkkkkkkkkkkkkkkkkkkkkkkkkkkk" << endl;
+            else
+                cout << "result:nooooooooooooooooooooooooooooo" << endl;
             cout << "quit?(y/n):";
+            cin.clear();
             cin >> quit;
-        } while (quit != "y"); */
+        } while (quit != "y");
     }
 }
