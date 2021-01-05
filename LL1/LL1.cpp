@@ -211,7 +211,7 @@ void LL1::print(){
         if((*it)!="@")
             cout<<std::left <<std::setw(15)<< (*it) ;
     for (auto t_it = analysis_table.cbegin(); t_it != analysis_table.cend(); ++t_it){
-        cout << endl<<std::left<<std::setw(15)<< (*t_it).first;
+        cout << endl<<endl<<std::left<<std::setw(15)<< (*t_it).first;
         for (auto it = terminal.cbegin(); it != terminal.cend();++it){
             if((*it)!="@"){
                 //cout<< (*it)<<" -> " ;
@@ -260,6 +260,7 @@ void LL1::string2production(){
             }
             out.push_back(right_symbol);
         }
+        
         //存入产生式数据中
         raw_production[left_symbol].push_back(out);
     }

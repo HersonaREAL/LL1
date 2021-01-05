@@ -28,6 +28,8 @@ bool LL1::cookProduction(){
                     //产生新候选式
                     vector<prodc_output> new_right;
                     for (auto j_it = Aj_right.begin(); j_it != Aj_right.end();++j_it){
+                        if((*j_it)[0]=="@")
+                            continue;
                         //替换AJ
                         prodc_output tmp((*j_it));
                         tmp.insert(tmp.end(), (*it).begin() + 1, (*it).end());
