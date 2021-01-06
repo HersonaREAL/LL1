@@ -81,11 +81,18 @@ void LL1::removeDirect(Production_tmp &pt, int i){
     const string &new_left = left + "'";
     const list<prodc_output> &all_right = pt[i].second;
     for (auto right_it = all_right.begin(); right_it != all_right.end();++right_it){
+
         if((*right_it)[0]==left){
             //去除P，α后面加上P'
             alpha.emplace_back((*right_it).begin()+1,(*right_it).end());
             alpha.back().push_back(new_left);
         }else{
+            //空串只加P'
+            if((*right_it)[0]=="@"){
+                beta.push_back({new_left});
+                continue;
+            }
+            
             beta.push_back(*right_it);
             //β后面加上P'
             beta.back().push_back(new_left);
