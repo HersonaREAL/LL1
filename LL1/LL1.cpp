@@ -59,6 +59,8 @@ bool LL1::parse(std::istream &is){
         const string stk_top = stk.back();
         //语法正确
         if(stk_top=="#"){
+            if (stk_top != *it)
+                return false;
             stk.pop_back();
             cout << "action: accept" << endl
                  << endl;
