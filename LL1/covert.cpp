@@ -22,7 +22,7 @@ bool LL1::cookProduction(){
             list<prodc_output> &Ai_right = tmp_production[i].second;
             const list<prodc_output> &Aj_right = tmp_production[j].second;
             //遍历Ai右边
-            for (auto it = Ai_right.begin(); it != Ai_right.end();++it){
+            for (auto it = Ai_right.begin(); it != Ai_right.end();){
                 if((*it)[0]==Aj){
                     //Ai->Ajγ
                     //产生新候选式
@@ -40,7 +40,9 @@ bool LL1::cookProduction(){
                     
                     //删除原候选式
                     it = Ai_right.erase(it);
+                    continue;
                 }
+                ++it;
             }
         }
         removeDirect(tmp_production, i);
@@ -50,7 +52,7 @@ bool LL1::cookProduction(){
     
     removeLeftCommonFactor();
     cooked_production.clear();
-    cooked_production.insert(tmp_production.begin(), tmp_production.end());
+    cooked_production.insert(lst_tmp_prodc.cbegin(), lst_tmp_prodc.cend());
 
     //记录终结符与非终结符
     for(auto ptr = cooked_production.begin(); ptr != cooked_production.end();++ptr){
@@ -125,11 +127,11 @@ void LL1::removeLeftCommonFactor(){
     //A->aβ1|aβ2|...|aβi|βi+1|...|βj|a
     //A->aA'|βi+1|...|βj 
     //A->β1|...|βj|@
-    tmp_production.assign(cooked_production.begin(), cooked_production.end());
-    for (int i = 0; i < tmp_production.size();++i){
-        const string &left = tmp_production[i].first;
-        const string &newleft = left + "\"";
-        list<prodc_output> &all_right = tmp_production[i].second;
+    lst_tmp_prodc.assign(cooked_production.begin(), cooked_production.end());
+    for (auto lst_it = lst_tmp_prodc.begin(); lst_it != lst_tmp_prodc.end();++lst_it){
+        const string &left = (*lst_it).first;
+        string newleft = left + "\"";
+        list<prodc_output> &all_right = (*lst_it).second;
         map<string, unsigned> count;//计算右边第一个符号出现的次数
         for (auto v_it = all_right.cbegin(); v_it != all_right.cend();++v_it)
             ++count[(*v_it)[0]];
@@ -149,9 +151,22 @@ void LL1::removeLeftCommonFactor(){
                     --v_it;
                 }
             }
+
             //生成新的候选式
-            tmp_production[i].second.push_back({left_com, newleft});
-            tmp_production.push_back({newleft, new_right});
+            //消除名字重复
+            while (std::find_if(lst_tmp_prodc.crbegin(), lst_tmp_prodc.crend(), [newleft](const pair<prodc_input, std::list<prodc_output>> &t) { return t.first == newleft; }) != lst_tmp_prodc.crend())
+                newleft += "\"";
+
+            //擦除原产生式并放到后面
+            all_right.push_back({left_com, newleft});
+            lst_tmp_prodc.push_back(*lst_it);
+            lst_it = lst_tmp_prodc.erase(lst_it);
+
+            //新候选式插入
+            lst_tmp_prodc.push_back({newleft, new_right});
+
+
+            --lst_it;
         }
     }
 }

@@ -18,6 +18,7 @@ private:
     using prodc_output = std::vector<std::string>;//产生式输出 eg. E -> A B C
     using Production = std::unordered_map<prodc_input, std::list<prodc_output>>;
     using Production_tmp = std::vector<std::pair<prodc_input, std::list<prodc_output>>>;
+    using Production__lst_tmp = std::list<std::pair<prodc_input, std::list<prodc_output>>>;
     using First_set = std::unordered_map<std::string, std::unordered_set<std::string>>;
     using Follow_set = std::unordered_map<std::string, std::unordered_set<std::string>>;
 
@@ -25,6 +26,7 @@ private:
     std::vector<std::string> origin_input;//最原始的输入，即文法
     Production raw_production;//未消除左递归的产生式
     Production_tmp tmp_production;//中间产物
+    Production__lst_tmp lst_tmp_prodc; //中间产物
     Production cooked_production;//已处理好的产生式
     std::unordered_set<std::string> terminal;//终结符
     std::unordered_set<std::string> non_terminal;//非终结符
