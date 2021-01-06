@@ -6,6 +6,7 @@ using std::map;
 using std::pair;
 using std::string;
 using std::unordered_map;
+using std::unordered_set;
 using std::vector;
 bool LL1::cookProduction(){
     //非终结符排序时，把开始符号放后面，防止简化出屎
@@ -128,6 +129,13 @@ void LL1::removeLeftCommonFactor(){
     //A->aA'|βi+1|...|βj 
     //A->β1|...|βj|@
     lst_tmp_prodc.assign(cooked_production.begin(), cooked_production.end());
+
+    //防止重名的集合
+    unordered_set<string> name_set;
+    for (auto lst_it = lst_tmp_prodc.begin(); lst_it != lst_tmp_prodc.end();++lst_it)
+        name_set.insert((*lst_it).first);
+
+    //遍历所有产生式
     for (auto lst_it = lst_tmp_prodc.begin(); lst_it != lst_tmp_prodc.end();++lst_it){
         const string &left = (*lst_it).first;
         string newleft = left + "\"";
@@ -135,12 +143,14 @@ void LL1::removeLeftCommonFactor(){
         map<string, unsigned> count;//计算右边第一个符号出现的次数
         for (auto v_it = all_right.cbegin(); v_it != all_right.cend();++v_it)
             ++count[(*v_it)[0]];
+
         //找有无公共左因子
         auto com_it = find_if(count.begin(), count.end(), [](const pair<string, unsigned> &a) { return a.second > 1; });
         if(com_it!=count.end()){
             string left_com = (*com_it).first;
             list<prodc_output> new_right;
             for (auto v_it = all_right.begin(); v_it != all_right.end();++v_it){
+
                 //遍历右边,找到公共左因子式子进行操作
                 if((*v_it)[0]==left_com){
                     if((*v_it).size()==1)
@@ -152,9 +162,9 @@ void LL1::removeLeftCommonFactor(){
                 }
             }
 
-            //生成新的候选式
+            
             //消除名字重复
-            while (std::find_if(lst_tmp_prodc.crbegin(), lst_tmp_prodc.crend(), [newleft](const pair<prodc_input, std::list<prodc_output>> &t) { return t.first == newleft; }) != lst_tmp_prodc.crend())
+            while (name_set.find(newleft)!=name_set.end())
                 newleft += "\"";
 
             //擦除原产生式并放到后面
@@ -165,7 +175,7 @@ void LL1::removeLeftCommonFactor(){
             //新候选式插入
             lst_tmp_prodc.push_back({newleft, new_right});
 
-
+            name_set.insert(newleft);
             --lst_it;
         }
     }
